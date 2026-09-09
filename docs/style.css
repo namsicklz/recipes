@@ -73,58 +73,37 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
-#search {
-  display: block;
-  width: calc(100% - 48px);
-  max-width: calc(var(--max-width) - 48px);
-  margin: 10px auto 0;
-  font-size: 1rem;
-  padding: 10px 14px;
+.controls {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 10px 24px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#search, #cat-jump {
+  font-size: 0.95rem;
+  padding: 9px 12px;
   border: 2px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--card-bg);
   color: var(--text);
   font-family: inherit;
 }
 
-#search:focus {
+#search {
+  flex: 1 1 240px;
+}
+
+#cat-jump {
+  flex: 0 1 240px;
+  cursor: pointer;
+}
+
+#search:focus, #cat-jump:focus {
   outline: none;
   border-color: var(--accent);
-}
-
-.cat-nav {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 10px 24px 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 5px 11px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.pill:hover {
-  border-color: var(--accent);
-  text-decoration: none;
-  color: var(--accent-dark);
-}
-
-.pill-count {
-  color: var(--muted);
-  font-size: 0.82em;
 }
 
 /* ---------- Category sections + recipe grid ---------- */

@@ -281,10 +281,13 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <h1>Sam's Recipes</h1>
 <span class="count-pill">{total} recipes</span>
 </div>
+<div class="controls">
 <input id="search" type="search" placeholder="Search recipes..." autocomplete="off">
-<nav class="cat-nav">
-{nav_pills}
-</nav>
+<select id="cat-jump" aria-label="Jump to category">
+<option value="">Jump to category…</option>
+{cat_options}
+</select>
+</div>
 </header>
 <main class="page">
 <div id="sections">
@@ -318,7 +321,7 @@ def build():
         (RECIPES_OUT_DIR / f"{slug}.html").write_text(html)
 
     sections_html = []
-    nav_pills = []
+    cat_options = []
     linked_slugs = set()
     total = 0
 
@@ -334,7 +337,7 @@ def build():
             cat_slug = slugify(cat_name)
             icon = CATEGORY_ICONS.get(cat_name, "🍴")
             total += len(items)
-            nav_pills.append(f'<a class="pill" href="#{cat_slug}">{icon} {cat_name} <span class="pill-count">{len(items)}</span></a>')
+            cat_options.append(f'<option value="#{cat_slug}">{icon} {cat_name} ({len(items)})</option>')
             sections_html.append(
                 f'<section class="category" id="{cat_slug}">'
                 f'<h2>{icon} {cat_name} <span class="cat-count">{len(items)}</span></h2>'
@@ -349,7 +352,7 @@ def build():
         )
         icon = CATEGORY_ICONS["Other"]
         total += len(orphans)
-        nav_pills.append(f'<a class="pill" href="#other">{icon} Other <span class="pill-count">{len(orphans)}</span></a>')
+        cat_options.append(f'<option value="#other">{icon} Other ({len(orphans)})</option>')
         sections_html.append(
             f'<section class="category" id="other"><h2>{icon} Other <span class="cat-count">{len(orphans)}</span></h2>'
             f'<ul class="recipe-list">{items}</ul></section>'
@@ -357,7 +360,7 @@ def build():
 
     index_html = INDEX_TEMPLATE.format(
         sections="\n".join(sections_html),
-        nav_pills="\n".join(nav_pills),
+        cat_options="\n".join(cat_options),
         total=total,
     )
     (OUT_DIR / "index.html").write_text(index_html)
