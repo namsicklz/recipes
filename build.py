@@ -8,7 +8,6 @@ Usage: python3 build.py
 """
 
 import re
-import os
 import shutil
 from pathlib import Path
 
@@ -18,6 +17,40 @@ OUT_DIR = Path(__file__).parent / "docs"
 RECIPES_OUT_DIR = OUT_DIR / "recipes"
 
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
+
+CATEGORY_ICONS = {
+    "Mains — Chicken": "🍗",
+    "Mains — Beef": "🥩",
+    "Mains — Pork": "🥓",
+    "Mains — Seafood": "🦐",
+    "Mains — Vegetarian": "🌱",
+    "Sides": "🥔",
+    "Salads": "🥗",
+    "Soups & Stews": "🍲",
+    "Wraps & Handhelds": "🌯",
+    "Sauces, Dips, Dressings & Spice Blends": "🧂",
+    "Desserts & Baking": "🍰",
+    "Breakfast": "🥞",
+    "Drinks": "🥤",
+    "Uncategorized / thin": "📋",
+    "Other": "📋",
+}
+
+HEADING_ICONS = [
+    ("ingredients", "🧂"),
+    ("instructions", "👩‍🍳"),
+    ("method", "👩‍🍳"),
+    ("directions", "👩‍🍳"),
+    ("nutrition", "📊"),
+    ("chef", "💡"),
+    ("tip", "💡"),
+    ("storage", "🧊"),
+    ("serving", "🍽️"),
+    ("variation", "🔀"),
+    ("note", "📝"),
+    ("what it is", "ℹ️"),
+    ("what it includes", "ℹ️"),
+]
 
 
 def slugify(name: str) -> str:
@@ -41,10 +74,34 @@ def inline_md(text: str) -> str:
     return text
 
 
-def md_to_html(body: str) -> str:
+def heading_icon(text: str) -> str:
+    lower = text.lower()
+    for keyword, icon in HEADING_ICONS:
+        if lower.startswith(keyword):
+            return icon + " "
+    return ""
+
+
+def try_meta_badges(stripped: str):
+    """A line like '**Serves:** 4 · **Prep:** 10 min' becomes a badge row."""
+    if "·" not in stripped:
+        return None
+    segments = [s.strip() for s in stripped.split("·")]
+    badges = []
+    for seg in segments:
+        m = re.match(r"^\*\*(.+?):?\*\*:?\s*(.*)$", seg)
+        if not m or not m.group(2).strip():
+            return None
+        label = m.group(1).strip().rstrip(":")
+        value = m.group(2).strip()
+        badges.append((label, value))
+    return badges
+
+
+def md_to_html(body: str):
     lines = body.split("\n")
     html = []
-    list_stack = []  # stack of 'ul'/'ol'
+    list_stack = []
     table_rows = []
     in_table = False
 
@@ -57,7 +114,7 @@ def md_to_html(body: str) -> str:
         if not table_rows:
             in_table = False
             return
-        html.append('<table>')
+        html.append("<table>")
         header = table_rows[0]
         html.append("<thead><tr>" + "".join(f"<th>{inline_md(c.strip())}</th>" for c in header) + "</tr></thead>")
         html.append("<tbody>")
@@ -69,6 +126,8 @@ def md_to_html(body: str) -> str:
 
     seen_h1 = False
     title = None
+    lead = None
+    seen_body_block = False
 
     for raw in lines:
         line = raw.rstrip()
@@ -100,13 +159,15 @@ def md_to_html(body: str) -> str:
         if h_match:
             close_lists()
             level = len(h_match.group(1))
-            text = inline_md(h_match.group(2))
+            raw_text = h_match.group(2)
             if level == 1 and not seen_h1:
                 seen_h1 = True
-                title = h_match.group(2)
-                continue  # title rendered separately as page <h1>
+                title = raw_text
+                continue
+            text = inline_md(raw_text)
             tag = f"h{min(level + 1, 4)}"
-            html.append(f"<{tag}>{text}</{tag}>")
+            html.append(f"<{tag}>{heading_icon(raw_text)}{text}</{tag}>")
+            seen_body_block = True
             continue
 
         ol_match = re.match(r"^(\d+)\.\s+(.*)$", stripped)
@@ -118,6 +179,7 @@ def md_to_html(body: str) -> str:
                 list_stack.append("ol")
                 html.append("<ol>")
             html.append(f"<li>{inline_md(ol_match.group(2))}</li>")
+            seen_body_block = True
             continue
 
         if ul_match:
@@ -126,16 +188,33 @@ def md_to_html(body: str) -> str:
                 list_stack.append("ul")
                 html.append("<ul>")
             html.append(f"<li>{inline_md(ul_match.group(1))}</li>")
+            seen_body_block = True
             continue
 
         close_lists()
-        html.append(f"<p>{inline_md(stripped)}</p>")
+
+        badges = try_meta_badges(stripped)
+        if badges:
+            spans = "".join(
+                f'<span class="badge"><strong>{label}</strong> {inline_md(value)}</span>'
+                for label, value in badges
+            )
+            html.append(f'<div class="meta-badges">{spans}</div>')
+            seen_body_block = True
+            continue
+
+        if lead is None and not seen_body_block:
+            lead = f'<p class="lead">{inline_md(stripped)}</p>'
+        else:
+            html.append(f"<p>{inline_md(stripped)}</p>")
+        seen_body_block = True
 
     if in_table:
         flush_table()
     close_lists()
 
-    return "\n".join(html), title
+    body_html = (lead or "") + "\n".join(html)
+    return body_html, title
 
 
 def parse_index():
@@ -156,7 +235,6 @@ def parse_index():
             m = WIKILINK_RE.search(line)
             if m:
                 current[1].append(m.group(1))
-    # Drop the trailing meta section, which has no recipe links
     categories = [c for c in categories if c[1]]
     return categories
 
@@ -167,14 +245,21 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title} — Sam's Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{css_path}style.css">
 </head>
 <body>
-<div class="page">
+<header class="topbar">
 <a class="back" href="{css_path}index.html">&larr; All recipes</a>
+</header>
+<main class="page recipe-page">
+<article class="recipe-card">
 <h1>{title}</h1>
 {content}
-</div>
+</article>
+</main>
 </body>
 </html>
 """
@@ -185,16 +270,27 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sam's Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="page">
+<header class="topbar sticky">
+<div class="topbar-inner">
 <h1>Sam's Recipes</h1>
+<span class="count-pill">{total} recipes</span>
+</div>
 <input id="search" type="search" placeholder="Search recipes..." autocomplete="off">
+<nav class="cat-nav">
+{nav_pills}
+</nav>
+</header>
+<main class="page">
 <div id="sections">
 {sections}
 </div>
-</div>
+</main>
 <script src="search.js"></script>
 </body>
 </html>
@@ -208,7 +304,6 @@ def build():
 
     categories = parse_index()
 
-    # Build every recipe page, keyed by slug
     recipe_files = {p.stem: p for p in VAULT_RECIPES_DIR.glob("*.md") if p.name != "Recipes.md"}
     built_slugs = set()
 
@@ -222,9 +317,11 @@ def build():
         html = PAGE_TEMPLATE.format(title=title, css_path="../", content=content_html)
         (RECIPES_OUT_DIR / f"{slug}.html").write_text(html)
 
-    # Build index.html sections from Recipes.md category order
     sections_html = []
+    nav_pills = []
     linked_slugs = set()
+    total = 0
+
     for cat_name, names in categories:
         items = []
         for name in sorted(names):
@@ -234,23 +331,35 @@ def build():
                 continue
             items.append(f'<li><a class="recipe-link" href="recipes/{slug}.html">{name}</a></li>')
         if items:
+            cat_slug = slugify(cat_name)
+            icon = CATEGORY_ICONS.get(cat_name, "🍴")
+            total += len(items)
+            nav_pills.append(f'<a class="pill" href="#{cat_slug}">{icon} {cat_name} <span class="pill-count">{len(items)}</span></a>')
             sections_html.append(
-                f'<section class="category"><h2>{cat_name}</h2><ul class="recipe-list">'
-                + "".join(items)
-                + "</ul></section>"
+                f'<section class="category" id="{cat_slug}">'
+                f'<h2>{icon} {cat_name} <span class="cat-count">{len(items)}</span></h2>'
+                f'<ul class="recipe-list">' + "".join(items) + "</ul></section>"
             )
 
-    # Catch any recipe notes not referenced in the index, so nothing gets lost
-    orphans = sorted(set(recipe_files.keys()) - {slugify(n) for _, names in categories for n in names})
     orphans = [s for s in recipe_files if slugify(s) not in linked_slugs]
     if orphans:
         items = "".join(
             f'<li><a class="recipe-link" href="recipes/{slugify(s)}.html">{s}</a></li>'
             for s in sorted(orphans)
         )
-        sections_html.append(f'<section class="category"><h2>Other</h2><ul class="recipe-list">{items}</ul></section>')
+        icon = CATEGORY_ICONS["Other"]
+        total += len(orphans)
+        nav_pills.append(f'<a class="pill" href="#other">{icon} Other <span class="pill-count">{len(orphans)}</span></a>')
+        sections_html.append(
+            f'<section class="category" id="other"><h2>{icon} Other <span class="cat-count">{len(orphans)}</span></h2>'
+            f'<ul class="recipe-list">{items}</ul></section>'
+        )
 
-    index_html = INDEX_TEMPLATE.format(sections="\n".join(sections_html))
+    index_html = INDEX_TEMPLATE.format(
+        sections="\n".join(sections_html),
+        nav_pills="\n".join(nav_pills),
+        total=total,
+    )
     (OUT_DIR / "index.html").write_text(index_html)
 
     shutil.copy(Path(__file__).parent / "assets" / "style.css", OUT_DIR / "style.css")
