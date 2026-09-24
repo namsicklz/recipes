@@ -257,9 +257,11 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <main class="page recipe-page">
 <article class="recipe-card">
 <h1>{title}</h1>
+<button id="shopping-list-btn" class="shop-btn" type="button">🖨️ Print Shopping List</button>
 {content}
 </article>
 </main>
+<script src="{css_path}shop.js"></script>
 </body>
 </html>
 """
@@ -367,6 +369,7 @@ def build():
 
     shutil.copy(Path(__file__).parent / "assets" / "style.css", OUT_DIR / "style.css")
     shutil.copy(Path(__file__).parent / "assets" / "search.js", OUT_DIR / "search.js")
+    shutil.copy(Path(__file__).parent / "assets" / "shop.js", OUT_DIR / "shop.js")
 
     print(f"Built {len(built_slugs)} recipe pages and {len(sections_html)} sections into {OUT_DIR}")
 

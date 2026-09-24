@@ -309,6 +309,87 @@ header.topbar {
   color: transparent;
 }
 
+.shop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0.2em 0 1.1em;
+  padding: 11px 20px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #08080a;
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.shop-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-gold);
+}
+
+.shop-btn.copied {
+  background: linear-gradient(100deg, #7cff6b, var(--accent-2));
+}
+
+/* ---------- Printable shopping list ---------- */
+
+#print-shopping-list { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  #print-shopping-list, #print-shopping-list * { visibility: visible; }
+  #print-shopping-list {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.4in 0.6in;
+    background: #ffffff;
+    color: #111111;
+    font-family: "Inter", -apple-system, sans-serif;
+  }
+  #print-shopping-list h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 22pt;
+    margin: 0 0 4pt;
+    color: #111111;
+  }
+  #print-shopping-list .print-date {
+    color: #555555;
+    font-size: 10pt;
+    margin: 0 0 18pt;
+  }
+  #print-shopping-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #print-shopping-list li {
+    font-size: 13pt;
+    padding: 8pt 0 8pt 28pt;
+    position: relative;
+    border-bottom: 0.5pt solid #dddddd;
+  }
+  #print-shopping-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9pt;
+    width: 13pt;
+    height: 13pt;
+    border: 1.3pt solid #333333;
+    border-radius: 2pt;
+  }
+  @page { margin: 0.6in; }
+}
+
 .recipe-card .lead {
   font-family: "Inter", sans-serif;
   font-size: 1.05rem;
