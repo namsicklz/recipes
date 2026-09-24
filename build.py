@@ -11,7 +11,7 @@ import re
 import shutil
 from pathlib import Path
 
-VAULT_RECIPES_DIR = Path("/Users/samnicholls/Vault/02 - Personal/Recipes")
+VAULT_RECIPES_DIR = Path("/Users/nixhomeserver/Vault/02 - Personal/Recipes")
 INDEX_FILE = VAULT_RECIPES_DIR / "Recipes.md"
 OUT_DIR = Path(__file__).parent / "docs"
 RECIPES_OUT_DIR = OUT_DIR / "recipes"
