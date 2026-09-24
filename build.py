@@ -67,6 +67,32 @@ def strip_frontmatter(text: str) -> str:
     return text
 
 
+def parse_frontmatter(text: str) -> dict:
+    fields = {}
+    if text.startswith("---"):
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            for line in parts[1].strip().split("\n"):
+                if ":" in line:
+                    key, _, value = line.partition(":")
+                    fields[key.strip()] = value.strip()
+    return fields
+
+
+OWNERS = ["Sam and Lana", "Pete and Levada", "Alex and Karen", "Tanya"]
+
+OWNER_COLORS = {
+    "Sam and Lana": "#ffcf4d",
+    "Pete and Levada": "#00e5ff",
+    "Alex and Karen": "#ff2fd0",
+    "Tanya": "#7cff6b",
+}
+
+
+def owner_short(owner: str) -> str:
+    return owner.replace(" and ", " & ")
+
+
 def inline_md(text: str) -> str:
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"(?<!\*)\*([^*]+?)\*(?!\*)", r"<em>\1</em>", text)
@@ -256,6 +282,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </header>
 <main class="page recipe-page">
 <article class="recipe-card">
+{owner_badge}
 <h1>{title}</h1>
 <button id="shopping-list-btn" class="shop-btn" type="button">🖨️ Print Shopping List</button>
 {content}
@@ -290,6 +317,9 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 {cat_options}
 </select>
 </div>
+<div class="owner-filters" id="owner-filters">
+{owner_chips}
+</div>
 </header>
 <main class="page">
 <div id="sections">
@@ -311,15 +341,23 @@ def build():
 
     recipe_files = {p.stem: p for p in VAULT_RECIPES_DIR.glob("*.md") if p.name != "Recipes.md"}
     built_slugs = set()
+    owner_by_slug = {}
 
     for stem, path in recipe_files.items():
         raw = path.read_text()
+        fm = parse_frontmatter(raw)
+        owner = fm.get("owner") or OWNERS[0]
         body = strip_frontmatter(raw)
         content_html, title = md_to_html(body)
         title = title or stem
         slug = slugify(stem)
         built_slugs.add(slug)
-        html = PAGE_TEMPLATE.format(title=title, css_path="../", content=content_html)
+        owner_by_slug[slug] = owner
+        owner_badge = (
+            f'<div class="owner-badge" style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}">'
+            f'👤 {owner_short(owner)}</div>'
+        )
+        html = PAGE_TEMPLATE.format(title=title, css_path="../", content=content_html, owner_badge=owner_badge)
         (RECIPES_OUT_DIR / f"{slug}.html").write_text(html)
 
     sections_html = []
@@ -334,7 +372,13 @@ def build():
             linked_slugs.add(slug)
             if slug not in built_slugs:
                 continue
-            items.append(f'<li><a class="recipe-link" href="recipes/{slug}.html">{name}</a></li>')
+            owner = owner_by_slug.get(slug, OWNERS[0])
+            items.append(
+                f'<li data-owner="{owner}"><a class="recipe-link" href="recipes/{slug}.html">'
+                f'<span class="recipe-link-name">{name}</span>'
+                f'<span class="owner-dot" style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}" title="{owner}"></span>'
+                f'</a></li>'
+            )
         if items:
             cat_slug = slugify(cat_name)
             icon = CATEGORY_ICONS.get(cat_name, "🍴")
@@ -349,7 +393,12 @@ def build():
     orphans = [s for s in recipe_files if slugify(s) not in linked_slugs]
     if orphans:
         items = "".join(
-            f'<li><a class="recipe-link" href="recipes/{slugify(s)}.html">{s}</a></li>'
+            (lambda owner: (
+                f'<li data-owner="{owner}"><a class="recipe-link" href="recipes/{slugify(s)}.html">'
+                f'<span class="recipe-link-name">{s}</span>'
+                f'<span class="owner-dot" style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}" title="{owner}"></span>'
+                f'</a></li>'
+            ))(owner_by_slug.get(slugify(s), OWNERS[0]))
             for s in sorted(orphans)
         )
         icon = CATEGORY_ICONS["Other"]
@@ -360,9 +409,17 @@ def build():
             f'<ul class="recipe-list">{items}</ul></section>'
         )
 
+    owner_chips = ['<button class="owner-chip active" data-owner="all" type="button">All Family</button>']
+    for owner in OWNERS:
+        owner_chips.append(
+            f'<button class="owner-chip" data-owner="{owner}" type="button" '
+            f'style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}">{owner_short(owner)}</button>'
+        )
+
     index_html = INDEX_TEMPLATE.format(
         sections="\n".join(sections_html),
         cat_options="\n".join(cat_options),
+        owner_chips="\n".join(owner_chips),
         total=total,
     )
     (OUT_DIR / "index.html").write_text(index_html)
