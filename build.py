@@ -79,13 +79,13 @@ def parse_frontmatter(text: str) -> dict:
     return fields
 
 
-OWNERS = ["Sam and Lana", "Pete and Lavada", "Alex and Karen", "Tanya, Lily and Alex"]
+OWNERS = ["Sam and Lana", "Pete and Lavada", "Alex and Karen", "Tania, Lili and Alex"]
 
 OWNER_COLORS = {
     "Sam and Lana": "#ffcf4d",
     "Pete and Lavada": "#00e5ff",
     "Alex and Karen": "#ff2fd0",
-    "Tanya, Lily and Alex": "#7cff6b",
+    "Tania, Lili and Alex": "#7cff6b",
 }
 
 
