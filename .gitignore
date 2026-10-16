@@ -5,5 +5,8 @@ __pycache__/
 # Private build output - contains the real webhook/key, never the public repo
 docs-private/
 
+# Contains the real HA webhook URL + shared key - private repo only, never here
+assets/meal-plan.js
+
 # LaunchAgent deploy log, not site content
 deploy.launchd.log
