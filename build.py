@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
 """
-Builds a static recipe site (into docs/) from the recipe notes in the Obsidian
-vault at VAULT_RECIPES_DIR. Re-run this any time recipes are added or edited
-in the vault, then commit + push docs/ to publish the update.
+Builds a static recipe site from the recipe notes in the Obsidian vault at
+VAULT_RECIPES_DIR. Re-run this any time recipes are added or edited in the
+vault, then commit + push to publish the update.
 
-Usage: python3 build.py
+Public build (default): into docs/, no shopping-list/meal-plan feature or
+secrets included at all - this is what's committed to the public repo.
+Private build (--private): into docs-private/, includes the shopping-list
+and meal-plan buttons + meal-plan.js with the real webhook/key. Only ever
+push docs-private/ to the separate private repo, never the public one.
+
+Usage: python3 build.py [--private]
 """
 
 import re
 import shutil
+import sys
 from pathlib import Path
+
+PRIVATE = "--private" in sys.argv
 
 VAULT_RECIPES_DIR = Path("/Users/nixhomeserver/Vault/02 - Personal/Recipes")
 INDEX_FILE = VAULT_RECIPES_DIR / "Recipes.md"
-OUT_DIR = Path(__file__).parent / "docs"
+OUT_DIR = Path(__file__).parent / ("docs-private" if PRIVATE else "docs")
 RECIPES_OUT_DIR = OUT_DIR / "recipes"
 
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
@@ -285,13 +294,36 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 {owner_badge}
 <h1>{title}</h1>
 <button id="shopping-list-btn" class="shop-btn" type="button">🖨️ Print Shopping List</button>
+{private_block}
 {content}
 </article>
 </main>
 <script src="{css_path}shop.js"></script>
+{private_script}
 </body>
 </html>
 """
+
+PRIVATE_BLOCK = """<button id="add-to-shopping-btn" class="shop-btn" type="button">🛒 Add to Shopping List</button>
+<div class="meal-plan-box">
+<select id="meal-plan-day" class="meal-plan-select" aria-label="Day to cook">
+<option value="">Plan this meal for…</option>
+<option value="0">Sunday</option>
+<option value="1">Monday</option>
+<option value="2">Tuesday</option>
+<option value="3">Wednesday</option>
+<option value="4">Thursday</option>
+<option value="5">Friday</option>
+<option value="6">Saturday</option>
+</select>
+<select id="meal-plan-type" class="meal-plan-select" aria-label="Meal">
+<option value="Breakfast">Breakfast</option>
+<option value="Lunch">Lunch</option>
+<option value="Dinner">Dinner</option>
+</select>
+<button id="meal-plan-btn" class="shop-btn" type="button">📅 Add to Meal Plan</button>
+</div>
+<p id="meal-plan-status" class="meal-plan-status" aria-live="polite"></p>"""
 
 INDEX_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -357,7 +389,14 @@ def build():
             f'<div class="owner-badge" style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}">'
             f'👤 {owner_short(owner)}</div>'
         )
-        html = PAGE_TEMPLATE.format(title=title, css_path="../", content=content_html, owner_badge=owner_badge)
+        html = PAGE_TEMPLATE.format(
+            title=title,
+            css_path="../",
+            content=content_html,
+            owner_badge=owner_badge,
+            private_block=PRIVATE_BLOCK if PRIVATE else "",
+            private_script='<script src="../meal-plan.js"></script>' if PRIVATE else "",
+        )
         (RECIPES_OUT_DIR / f"{slug}.html").write_text(html)
 
     sections_html = []
@@ -427,6 +466,8 @@ def build():
     shutil.copy(Path(__file__).parent / "assets" / "style.css", OUT_DIR / "style.css")
     shutil.copy(Path(__file__).parent / "assets" / "search.js", OUT_DIR / "search.js")
     shutil.copy(Path(__file__).parent / "assets" / "shop.js", OUT_DIR / "shop.js")
+    if PRIVATE:
+        shutil.copy(Path(__file__).parent / "assets" / "meal-plan.js", OUT_DIR / "meal-plan.js")
 
     print(f"Built {len(built_slugs)} recipe pages and {len(sections_html)} sections into {OUT_DIR}")
 

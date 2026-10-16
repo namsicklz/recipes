@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+# Private build output - contains the real webhook/key, never the public repo
+docs-private/
