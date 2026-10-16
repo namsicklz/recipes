@@ -305,25 +305,27 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 """
 
 PRIVATE_BLOCK = """<button id="add-to-shopping-btn" class="shop-btn" type="button">🛒 Add to Shopping List</button>
-<div class="meal-plan-box">
-<select id="meal-plan-day" class="meal-plan-select" aria-label="Day to cook">
-<option value="">Plan this meal for…</option>
-<option value="0">Sunday</option>
-<option value="1">Monday</option>
-<option value="2">Tuesday</option>
-<option value="3">Wednesday</option>
-<option value="4">Thursday</option>
-<option value="5">Friday</option>
-<option value="6">Saturday</option>
-</select>
-<select id="meal-plan-type" class="meal-plan-select" aria-label="Meal">
+<button id="open-meal-plan-btn" class="shop-btn" type="button">📅 Add to Meal Plan</button>
+<p id="meal-plan-status" class="meal-plan-status" aria-live="polite"></p>
+<div id="meal-plan-modal" class="meal-plan-modal" hidden>
+<div class="meal-plan-modal-content">
+<h2>Plan This Meal</h2>
+<label class="meal-plan-field">Date
+<input type="date" id="meal-plan-date">
+</label>
+<label class="meal-plan-field">Meal
+<select id="meal-plan-type" class="meal-plan-select">
 <option value="Breakfast">Breakfast</option>
 <option value="Lunch">Lunch</option>
 <option value="Dinner">Dinner</option>
 </select>
-<button id="meal-plan-btn" class="shop-btn" type="button">📅 Add to Meal Plan</button>
+</label>
+<div class="meal-plan-modal-actions">
+<button id="meal-plan-cancel-btn" class="shop-btn meal-plan-cancel" type="button">Cancel</button>
+<button id="meal-plan-confirm-btn" class="shop-btn" type="button">Add to Meal Plan</button>
 </div>
-<p id="meal-plan-status" class="meal-plan-status" aria-live="polite"></p>"""
+</div>
+</div>"""
 
 INDEX_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">

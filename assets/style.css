@@ -421,15 +421,67 @@ header.topbar {
   background: linear-gradient(100deg, #ff6b6b, var(--accent-2));
 }
 
-.meal-plan-box {
+.meal-plan-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 0.4em;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
 }
 
-.meal-plan-select {
+.meal-plan-modal[hidden] {
+  display: none;
+}
+
+.meal-plan-modal-content {
+  width: min(360px, 90vw);
+  padding: 28px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.meal-plan-modal-content h2 {
+  margin: 0 0 1em;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.meal-plan-field {
+  display: block;
+  margin: 0 0 1em;
+  font-family: "Inter", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.meal-plan-field input,
+.meal-plan-field select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+.meal-plan-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1.4em;
+}
+
+.meal-plan-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.meal-plan-select,
+.meal-plan-field input[type="date"] {
   padding: 10px 14px;
   font-family: "Inter", sans-serif;
   font-weight: 500;
@@ -439,6 +491,7 @@ header.topbar {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  color-scheme: dark;
 }
 
 .meal-plan-status {
