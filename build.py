@@ -346,6 +346,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <div class="topbar-inner">
 <h1>{site_name}</h1>
 <span class="count-pill">{total} recipes</span>
+{dashboard_link}
 </div>
 <div class="controls">
 <input id="search" type="search" placeholder="Search recipes..." autocomplete="off">
@@ -462,6 +463,12 @@ def build():
             f'style="--owner-color: {OWNER_COLORS.get(owner, "#ffcf4d")}">{owner_short(owner)}</button>'
         )
 
+    dashboard_link = (
+        '<a class="count-pill dashboard-link" '
+        'href="https://zfwby52wxnzxzbkegfstokvz4xwhvx9o.ui.nabu.casa/local/dashboard-wallpanel.html" '
+        'target="_blank" rel="noopener">🏠 Home Dashboard</a>'
+    ) if PRIVATE else ""
+
     index_html = INDEX_TEMPLATE.format(
         site_name=SITE_NAME,
         sections="\n".join(sections_html),
@@ -469,6 +476,7 @@ def build():
         owner_chips="\n".join(owner_chips),
         total=total,
         private_css='<link rel="stylesheet" href="style-private.css">' if PRIVATE else "",
+        dashboard_link=dashboard_link,
     )
     (OUT_DIR / "index.html").write_text(index_html)
 

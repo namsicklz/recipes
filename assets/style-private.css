@@ -32,3 +32,12 @@ body {
 .category:nth-of-type(6n+4) { --cat-accent: #fbbf24; }
 .category:nth-of-type(6n+5) { --cat-accent: #34d399; }
 .category:nth-of-type(6n+6) { --cat-accent: #60a5fa; }
+
+.dashboard-link {
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.dashboard-link:hover {
+  opacity: 0.8;
+}
