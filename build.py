@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 PRIVATE = "--private" in sys.argv
+SITE_NAME = "Nicholls Meal Planner" if PRIVATE else "Nicholls' Family Recipes"
 
 VAULT_RECIPES_DIR = Path("/Users/nixhomeserver/Vault/02 - Personal/Recipes")
 INDEX_FILE = VAULT_RECIPES_DIR / "Recipes.md"
@@ -279,11 +280,12 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title} — Nicholls' Family Recipes</title>
+<title>{title} — {site_name}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{css_path}style.css">
+{private_css}
 </head>
 <body>
 <header class="topbar">
@@ -332,16 +334,17 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nicholls' Family Recipes</title>
+<title>{site_name}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+{private_css}
 </head>
 <body>
 <header class="topbar sticky">
 <div class="topbar-inner">
-<h1>Nicholls' Family Recipes</h1>
+<h1>{site_name}</h1>
 <span class="count-pill">{total} recipes</span>
 </div>
 <div class="controls">
@@ -393,11 +396,13 @@ def build():
         )
         html = PAGE_TEMPLATE.format(
             title=title,
+            site_name=SITE_NAME,
             css_path="../",
             content=content_html,
             owner_badge=owner_badge,
             private_block=PRIVATE_BLOCK if PRIVATE else "",
             private_script='<script src="../meal-plan.js"></script>' if PRIVATE else "",
+            private_css='<link rel="stylesheet" href="../style-private.css">' if PRIVATE else "",
         )
         (RECIPES_OUT_DIR / f"{slug}.html").write_text(html)
 
@@ -458,10 +463,12 @@ def build():
         )
 
     index_html = INDEX_TEMPLATE.format(
+        site_name=SITE_NAME,
         sections="\n".join(sections_html),
         cat_options="\n".join(cat_options),
         owner_chips="\n".join(owner_chips),
         total=total,
+        private_css='<link rel="stylesheet" href="style-private.css">' if PRIVATE else "",
     )
     (OUT_DIR / "index.html").write_text(index_html)
 
@@ -470,6 +477,7 @@ def build():
     shutil.copy(Path(__file__).parent / "assets" / "shop.js", OUT_DIR / "shop.js")
     if PRIVATE:
         shutil.copy(Path(__file__).parent / "assets" / "meal-plan.js", OUT_DIR / "meal-plan.js")
+        shutil.copy(Path(__file__).parent / "assets" / "style-private.css", OUT_DIR / "style-private.css")
 
     print(f"Built {len(built_slugs)} recipe pages and {len(sections_html)} sections into {OUT_DIR}")
 

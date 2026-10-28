@@ -1,0 +1,34 @@
+/* Private-site-only accent palette override, loaded after style.css.
+   Keeps the public site's gold/cyan/magenta look untouched. */
+:root {
+  --accent: #2dd4bf;
+  --accent-dim: #1f9e8f;
+  --accent-2: #a78bfa;
+  --accent-3: #fb7185;
+  --glow-gold: 0 0 0 1px rgba(45, 212, 191, 0.4), 0 0 28px rgba(45, 212, 191, 0.18);
+  --glow-cyan: 0 0 0 1px rgba(167, 139, 250, 0.4), 0 0 28px rgba(167, 139, 250, 0.16);
+}
+
+body {
+  background-image:
+    radial-gradient(1100px 560px at 8% -12%, rgba(45, 212, 191, 0.10), transparent 55%),
+    radial-gradient(1000px 520px at 104% -6%, rgba(167, 139, 250, 0.08), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 42px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 42px);
+}
+
+.count-pill {
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+}
+
+.recipe-card ol li::before {
+  background: rgba(45, 212, 191, 0.06);
+}
+
+.category:nth-of-type(6n+1) { --cat-accent: #2dd4bf; }
+.category:nth-of-type(6n+2) { --cat-accent: #a78bfa; }
+.category:nth-of-type(6n+3) { --cat-accent: #fb7185; }
+.category:nth-of-type(6n+4) { --cat-accent: #fbbf24; }
+.category:nth-of-type(6n+5) { --cat-accent: #34d399; }
+.category:nth-of-type(6n+6) { --cat-accent: #60a5fa; }
