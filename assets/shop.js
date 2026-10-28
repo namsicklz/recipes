@@ -2,20 +2,26 @@
   var btn = document.getElementById("shopping-list-btn");
   if (!btn) return;
 
-  function findIngredientsList() {
+  function findIngredientItems() {
     var headings = document.querySelectorAll(".recipe-card h3, .recipe-card h4");
     for (var i = 0; i < headings.length; i++) {
       if (headings[i].textContent.toLowerCase().indexOf("ingredient") !== -1) {
+        var items = [];
         var el = headings[i].nextElementSibling;
-        while (el && el.tagName !== "UL") el = el.nextElementSibling;
-        if (el) return el;
+        while (el && !/^H[1-6]$/.test(el.tagName)) {
+          if (el.tagName === "UL") {
+            items = items.concat(Array.prototype.slice.call(el.querySelectorAll("li")));
+          }
+          el = el.nextElementSibling;
+        }
+        if (items.length) return items;
       }
     }
-    return null;
+    return [];
   }
 
-  var list = findIngredientsList();
-  if (!list) {
+  var items = findIngredientItems();
+  if (!items.length) {
     btn.style.display = "none";
     return;
   }
@@ -40,7 +46,7 @@
     container.appendChild(date);
 
     var ul = document.createElement("ul");
-    Array.prototype.forEach.call(list.querySelectorAll("li"), function (li) {
+    items.forEach(function (li) {
       var item = document.createElement("li");
       item.textContent = li.textContent.trim();
       ul.appendChild(item);
