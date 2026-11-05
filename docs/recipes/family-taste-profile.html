@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Taste Profile — Nicholls' Family Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+
+</head>
+<body>
+<header class="topbar">
+<a class="back" href="../index.html">&larr; All recipes</a>
+</header>
+<main class="page recipe-page">
+<article class="recipe-card">
+<div class="owner-badge" style="--owner-color: #ffcf4d">👤 Sam & Lana</div>
+<h1>Family Taste Profile</h1>
+<button id="shopping-list-btn" class="shop-btn" type="button">🖨️ Print Shopping List</button>
+
+<p class="lead">One-time analysis (2026-11-05) of all ~130 recipes in this folder, built to give `/recipe-trend-scan` a real taste signal instead of just category-count gap math. Built from a keyword frequency pass across every recipe's ingredients/instructions plus the full title list — not vibes.</p><h3>Flavor base: garlic + lemon, honey-glazed</h3>
+<ul>
+<li><strong>Garlic appears in ~80/130 recipes (62%)</strong> and <strong>lemon in ~53/130 (41%)</strong> — this is the household's actual flavor foundation, not just "a" flavor. Often together: <em>Garlic Lemon Butter Cod</em>, <em>Lemon Garlic Butter Salmon</em>, <em>Garlic & Rosemary Roast Potatoes</em>, <em>Chicken Kefta with Roasted Garlic Paprika Sauce</em>.</li>
+<li><strong>Honey-glaze pattern in ~29/130</strong>, concentrated in chicken and sides: <em>Garlic-Honey Glazed Chicken Thighs</em>, <em>Honey Chili Chicken</em>, <em>Garlic Sweet Chilli Baked Chicken</em>, <em>Honey Mustard Chicken, Avocado & Bacon Salad</em>, <em>Crispy Hot Honey Lemon Feta Chicken Cutlets</em>, <em>Crispy Smashed Sweet Potatoes with Whipped Feta & Hot Honey</em>.</li>
+</ul>
+<h3>Warm spice over raw heat</h3>
+<ul>
+<li>Paprika (32), cumin (23), chili (22) show a Mediterranean/Middle Eastern/Cajun/Mexican-adjacent lean — <em>Chicken Kefta</em>, <em>Classic Cajun Seasoning</em>, <em>Tandoori Chicken Wraps</em>, <em>Chicken Pulao Biryani</em>, <em>Mulligatawny Soup</em>, <em>Spicy Chicken Taco Sweet Potato</em>.</li>
+<li>Only ~18/130 touch any real heat (spicy/hot sauce/chili flake) and nothing in the library is genuinely hot — <strong>this family likes warm spice, not actual spiciness.</strong> A new recipe pitched as "fiery" or "intensely spicy" is a mismatch regardless of how trendy it is.</li>
+</ul>
+<h3>Secondary cuisine threads</h3>
+<ul>
+<li><strong>Asian-inspired (soy/ginger/sesame, ~19/19/14 files):</strong> <em>Black Pepper Beef Stir Fry</em>, <em>Crockpot Mongolian Beef & Noodles</em>, <em>Crockpot Shoyu Beef Yakisoba</em>, <em>20-Minute Wonton Soup</em>, <em>Bang Bang Chicken</em>, <em>Hainanese-Inspired Chicken Rice</em>, <em>Ebi Katsu Sando</em>.</li>
+<li><strong>Mediterranean (feta/tahini-chickpea/basil/balsamic/vinaigrette, roughly 5-10 files each):</strong> <em>Mediterranean Chickpea Salad</em>, <em>Greek Tortellini Salad</em>, <em>Smashed Cucumber & Feta Salad</em>, <em>Mango Chickpea Salad</em>, <em>Grilled Zucchini & Chickpea Wraps</em>.</li>
+<li>Indian cuisine present but thin (3 dishes: Tandoori, Biryani, Mulligatawny) — a real but minor thread, not a gap to chase aggressively.</li>
+</ul>
+<h3>Texture and method</h3>
+<ul>
+<li><strong>Crispy is a standing favorite (~22/130)</strong> across proteins and sides, not just one category: <em>Crispy Hot Honey Lemon Feta Chicken Cutlets</em>, <em>Crispy Chicken Pasta Salad</em>, <em>Crispy Orange Chicken Tacos</em>, <em>Crispy Air Fryer Apple Fries</em>, <em>Crispy Roast Potatoes</em>, <em>Crispy Pork & Corn Dumplings</em>.</li>
+<li>Practical weeknight methods matter: slow cooker/crockpot (5 explicit, several more braised), sheet-pan one-pan (9), air fryer (5).</li>
+<li><strong>"Michelin-style" elevated home cooking is a real, named pattern</strong> (6 titles use the exact phrase: <em>Michelin-Style Baked Spatchcock Chicken</em>, <em>Michelin Chicken Pesto Orzo</em>, <em>Michelin-Style Crushed Cucumber</em>, <em>Michelin-Style Pancakes</em>) — means restaurant-plating of simple, accessible ingredients, not technically hard cooking. A good future-pitch angle.</li>
+<li>Crowd-size batch cooking exists specifically for seafood (<em>Lemon Garlic Butter Salmon (Crowd-Size)</em>, <em>Garlic Lemon Butter Cod (Crowd-Size)</em>) — feeding the full multi-household group at once.</li>
+</ul>
+<h3>Dessert profile</h3>
+<ul>
+<li>Caramel/brown-sugar sweetness (17 files) dominates over straight chocolate — <em>Burnt Basque Cheesecake</em>, <em>Caramel Stuffed Brown Sugar Cookies</em>, <em>Salted Caramel Apple Campfire Pies</em>, <em>Brown Butter Chocolate Chip Cookie Fries</em>.</li>
+<li>Cheesecake is a recurring favorite format (4+ variations): <em>5-Layer Brownie Cookie Cheesecake</em>, <em>Burnt Basque Cheesecake</em>, <em>Rainbow Soufflé Cheesecake</em>.</li>
+</ul>
+<h3>What's genuinely rare or absent (don't chase confidently)</h3>
+<ul>
+<li><strong>Vegetarian/vegan (5/130)</strong> — matches the 1-recipe Vegetarian Mains category; a real, long-standing gap, not an oversight to second-guess.</li>
+<li>Genuinely spicy/hot food — see above.</li>
+<li>Scratch bread baking beyond pizza dough.</li>
+<li>Dairy-free or other health-restriction cooking as a pattern.</li>
+</ul>
+<h3>Kid-friendly signal</h3>
+<p>Explicit kid-titled recipes (<em>Kid-Friendly Steak Fried Rice</em>, <em>Kids Chocolate Chip Protein Balls</em>) lean mild and familiar-format rather than adventurous. Since two of the four households include kids, any gap-fill suggestion for Breakfast or Vegetarian Mains should skew approachable over novel.</p>
+<h3>How to use this</h3>
+<p>`/recipe-trend-scan` should weigh a candidate's actual flavor/method fit against this profile, not just whether it fills an empty category slot. The 2026-11-05 test run's three rejected picks (spinach egg bites, lentil gyros, crockpot pork chops with mushroom gravy) were all gap-shaped but none hit the real signature here — garlic+lemon+honey base, warm (not hot) spice, crispy texture, or the Michelin-style elevated-simple angle. A gap-fill candidate that also matches one of those threads is a much stronger pitch than one that merely fills an empty slot.</p>
+</article>
+</main>
+<script src="../shop.js"></script>
+
+</body>
+</html>
